@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+</head>
+<body>
+    <h1>Choose Your Payment Method</h1>
+    <form method="POST" action="{{ url_for('payment') }}">
+        <label>
+            <input type="radio" name="payment_method" value="Credit Card" required>
+            Credit Card
+        </label><br>
+        <label>
+            <input type="radio" name="payment_method" value="Bank Transfer" required>
+            Bank Transfer
+        </label><br>
+        <label>
+            <input type="radio" name="payment_method" value="Klarna" required>
+            Klarna
+        </label><br><br>
+        <button type="submit">Submit Payment</button>
+    </form>
+    <br>
+    <!-- Go Back to Home Page Button -->
+    <a href="{{ url_for('home') }}">
+        <button type="button">Go Back to Home Page</button>
+    </a>
+</body>
+</html>

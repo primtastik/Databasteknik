@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Tech Products</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Tech Products Store</h1>
+        <!-- Cart Button -->
+        <div class="cart">
+            <a href="{{ url_for('view_cart') }}">
+                🛒 Cart ({{ cart_item_count }} items)
+            </a>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <form method="GET" action="/">
+        <input type="text" name="search" placeholder="Search for products..." value="{{ request.args.get('search', '') }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Categories -->
+    <h2>Categories</h2>
+    <ul>
+        {% for category in categories %}
+            <li><a href="/?category_id={{ category['category_id'] }}">{{ category['catName'] }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <!-- Products -->
+    <h2>Available Products</h2>
+    <div class="product-list">
+        {% if products %}
+            {% for product in products %}
+                <div class="product-card">
+                    <h3>{{ product['pName'] }}</h3>
+                    <p>Price: ${{ product['price'] }}</p>
+                    <p>Stock: {{ product['stock'] }}</p>
+                    <a href="/add_to_cart/{{ product['products_id'] }}">Add to Cart</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No products available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
