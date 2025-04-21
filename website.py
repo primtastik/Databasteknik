@@ -23,24 +23,36 @@ def home():
     cursor = conn.cursor(dictionary=True)
 
     # Fetch categories using the stored procedure
-    cursor.execute("SELECT * FROM Category;")
+    cursor.callproc('fetch_categories')
+    for result in cursor.stored_results():
+        categories = result.fetchall()
 
-    cursor.fetchall()
-
-    # Get the search query from the URL parameter, default to empty string if not provided
+    # Get the search query and selected category from the URL parameters
     search_query = request.args.get('search', '')
+    category_id = request.args.get('category_id', None)
 
-    # Fetch the products based on the search query
-    if search_query:
-        # Use the LIKE operator to search for products whose names contain the search query
-        cursor.execute("SELECT * FROM Products WHERE pName LIKE %s", (f"%{search_query}%",))
+    # Build product query based on search and/or category
+    if search_query and category_id:
+        cursor.execute(
+            "SELECT * FROM Products WHERE pName LIKE %s AND category_id = %s",
+            (f"%{search_query}%", category_id)
+        )
+    elif search_query:
+        cursor.execute(
+            "SELECT * FROM Products WHERE pName LIKE %s",
+            (f"%{search_query}%",)
+        )
+    elif category_id:
+        cursor.execute(
+            "SELECT * FROM Products WHERE category_id = %s",
+            (category_id,)
+        )
     else:
-        # If no search query, fetch all products
         cursor.execute("SELECT * FROM Products")
     
     products = cursor.fetchall()
 
-    # Fetch the count of items in the cart
+    # Count number of items in the cart
     customer_id = session.get('customer_id', 100)
     cursor.execute("SELECT SUM(quantity) AS total_items FROM Cart_items WHERE customer_id = %s", (customer_id,))
     cart_item_count = cursor.fetchone()['total_items'] or 0
@@ -48,7 +60,7 @@ def home():
     cursor.close()
     conn.close()
 
-    return render_template('home.html', products=products, cart_item_count=cart_item_count, search_query=search_query)
+    return render_template('home.html', categories=categories, products=products, cart_item_count=cart_item_count, search_query=search_query)
 
 # Route to Add Product to Cart
 @app.route('/add_to_cart/<int:product_id>')
